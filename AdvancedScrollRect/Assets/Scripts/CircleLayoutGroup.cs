@@ -1,10 +1,13 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 [DisallowMultipleComponent]
+[RequireComponent(typeof(LayoutElement))]
 public sealed class CircleLayoutGroup : UIBehaviour,ILayoutElement,ILayoutGroup
 {
     [Range( 0f, 360f)]
@@ -64,6 +67,7 @@ public sealed class CircleLayoutGroup : UIBehaviour,ILayoutElement,ILayoutGroup
     {
         UpdateMinAngle();
     }
+
 #if UNITY_EDITOR
     protected override void OnValidate()
     {
