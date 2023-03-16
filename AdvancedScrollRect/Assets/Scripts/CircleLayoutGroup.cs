@@ -1,8 +1,8 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
+[DisallowMultipleComponent]
 public sealed class CircleLayoutGroup : UIBehaviour,ILayoutElement
 {
     [Range( 0f, 360f)]
@@ -34,7 +34,9 @@ public sealed class CircleLayoutGroup : UIBehaviour,ILayoutElement
         this.flexibleHeight = flexibleHeight;
         this.layoutPriority = layoutPriority;
     }
-    
+
+    #region UI-Behaviour
+
     protected override void OnEnable()
     { 
         base.OnEnable();
@@ -43,7 +45,7 @@ public sealed class CircleLayoutGroup : UIBehaviour,ILayoutElement
     
     protected override void OnRectTransformDimensionsChange()
     {
-         UpdateLayoutGroup();
+        UpdateLayoutGroup();
     }
 
     public void CalculateLayoutInputVertical()
@@ -63,20 +65,24 @@ public sealed class CircleLayoutGroup : UIBehaviour,ILayoutElement
         UpdateLayoutGroup();
     }
 #endif
+
+    #endregion
+   
     private void UpdateLayoutGroup()
     {
-        if ( GetChildCount() == 0 )
+        var childCount = GetChildCount();
+        if (childCount == 0)
             return;
-        var angleOffset = ( ( maxAngle - minAngle ) ) / ( transform.childCount - 1 );
+        var angleOffset = (( maxAngle - minAngle )) / ( childCount - 1 );
     
         var currentAngle = startAngle;
-        for ( int i = 0; i < GetChildCount(); i++ )
+        for ( var i = 0; i < childCount; i++ )
         {
             var child = (RectTransform)transform.GetChild(i);
             if (child == null) continue;
-            var vPos = new Vector3( Mathf.Cos(GetUpdatedAngle(currentAngle)), Mathf.Sin(GetUpdatedAngle(currentAngle)), 0);
-            child.localPosition = vPos * distance;
-            child.anchorMin = child.anchorMax = child.pivot = new Vector2(0.5f, 0.5f);
+            var currentPosition = new Vector2(Mathf.Cos(GetUpdatedAngle(currentAngle)), Mathf.Sin(GetUpdatedAngle(currentAngle)));
+            child.localPosition = currentPosition * distance;
+            child.anchorMin = child.anchorMax = child.pivot = Vector2.one *.5f;
             currentAngle += angleOffset;
         }
     }
