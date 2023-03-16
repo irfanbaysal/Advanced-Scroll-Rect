@@ -76,7 +76,7 @@ public sealed class CircleLayoutGroup : UIBehaviour,ILayoutElement,ILayoutGroup
     }
 #endif
     #endregion
-    private void UpdateLayoutGroup()
+    public void UpdateLayoutGroup()
     {
         var childCount = GetChildCount();
         if (childCount == 0)
@@ -87,7 +87,6 @@ public sealed class CircleLayoutGroup : UIBehaviour,ILayoutElement,ILayoutGroup
         {
             var child = (RectTransform)transform.GetChild(i);
             if (child == null) continue;
-            AddTracker(child);
             var currentPosition = new Vector2(Mathf.Cos(GetUpdatedAngle(currentAngle)), Mathf.Sin(GetUpdatedAngle(currentAngle)));
             child.localPosition = currentPosition * distance;
             child.anchorMin = child.anchorMax = child.pivot = Vector2.one *.5f;
@@ -98,19 +97,26 @@ public sealed class CircleLayoutGroup : UIBehaviour,ILayoutElement,ILayoutGroup
     {
         return transform.childCount;
     }
-    private void AddTracker(RectTransform child)
-    {
-        _mTracker.Clear();
-        _mTracker.Add( this, child,
-            DrivenTransformProperties.Anchors |
-            DrivenTransformProperties.AnchoredPosition |
-            DrivenTransformProperties.Pivot );
-    }
-    private void UpdateMinAngle()
+
+    public void UpdateMinAngle()
     {
         var proportion = maxAngle / GetChildCount();
         minAngle = proportion;
     }
+    public float GetMinAngle()
+    {
+        return minAngle;
+    }
+    public void SetMinAngle(float updatedValue)
+    {
+        minAngle = updatedValue;
+    }
+    
+    public float GetMaxAngle()
+    {
+        return maxAngle;
+    }
+    
     private float GetUpdatedAngle(float currentAngle) => currentAngle * Mathf.Deg2Rad;
 
 }
