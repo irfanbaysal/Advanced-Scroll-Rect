@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -110,6 +111,11 @@ public sealed class CircleLayoutGroup : UIBehaviour,ILayoutElement,ILayoutGroup
     public void SetMinAngle(float updatedValue)
     {
         minAngle = updatedValue;
+    }
+
+    public void SetDistance(float distance)
+    {
+        this.distance = distance;
     }
     
     public float GetMaxAngle()

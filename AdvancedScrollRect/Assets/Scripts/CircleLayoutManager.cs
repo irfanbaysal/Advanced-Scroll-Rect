@@ -6,8 +6,18 @@ using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum Type
+{
+    Fade,
+    Scale,
+    ScaleWithDistance
+}
+
 public class CircleLayoutManager : MonoBehaviour
 {
+
+    [SerializeField] private Type appearType, disappearType;
+    
    private CircleLayoutGroup CircleLayoutGroup =>
       _circleLayoutGroup ? _circleLayoutGroup : (_circleLayoutGroup = GetComponent<CircleLayoutGroup>());
    private CircleLayoutGroup _circleLayoutGroup;
@@ -19,10 +29,46 @@ public class CircleLayoutManager : MonoBehaviour
        _children=  CircleLayoutGroup.transform.GetComponentsInChildren<Transform>().ToList();   
    }
 
+   private void Appear()
+   {
+      PerformTypes(appearType,true);
+   }
+
+   private void Disappear()
+   {
+       PerformTypes(disappearType,false);
+   }
+
+   private void PerformTypes(Type type,bool isAppear)
+   {
+       switch (type)
+       {
+           case Type.Fade when isAppear:
+               FadeOpen();
+               break;
+           case Type.Fade:
+               FadeClose();
+               break;
+           case Type.Scale when isAppear:
+               ScaleOpen();
+               break;
+           case Type.Scale:
+               ScaleClose();
+               break;
+           case Type.ScaleWithDistance when isAppear:
+               ScaleOpenWithDistance();
+               break;
+           case Type.ScaleWithDistance:
+               ScaleCloseWithDistance();
+               break;
+       }
+   }
+
    private void FadeOpen()
    {
        var list = _children.ToList();
        CircleLayoutGroup.UpdateMinAngle();
+       CircleLayoutGroup.SetDistance(150);
        list.RemoveAt(0);
        list.ForEach(x => x.transform.localScale = Vector3.zero);
        list.ForEach(x=>x.transform.GetComponent<Image>().DOFade(0f,0f));
@@ -61,6 +107,8 @@ public class CircleLayoutManager : MonoBehaviour
    {
        var list = _children.ToList();
        CircleLayoutGroup.UpdateMinAngle();
+       CircleLayoutGroup.UpdateLayoutGroup();
+       CircleLayoutGroup.SetDistance(150);
        list.RemoveAt(0);
        list.ForEach(x => x.transform.localScale = Vector3.zero);
        list.ForEach(x=>x.transform.GetComponent<Image>().DOFade(0f,0f));
@@ -69,6 +117,48 @@ public class CircleLayoutManager : MonoBehaviour
        {
            list[i].transform.DOScale(1f, .5f).SetEase(Ease.OutBack);
            list[i].transform.GetComponent<Image>().DOFade(1f, .25f);
+       }
+   }
+   
+   private void ScaleOpenWithDistance()
+   {
+       var list = _children.ToList();
+       CircleLayoutGroup.UpdateMinAngle();
+       CircleLayoutGroup.UpdateLayoutGroup();
+       list.RemoveAt(0);
+       list.ForEach(x => x.transform.localScale = Vector3.zero);
+       list.ForEach(x=>x.transform.GetComponent<Image>().DOFade(1f,0f));
+
+       DOVirtual.Float(0f, 150f, .5f, (value =>
+       {
+           CircleLayoutGroup.SetDistance(value);
+           CircleLayoutGroup.UpdateLayoutGroup();
+
+       })).SetEase(Ease.OutBack);
+
+       foreach (var t in list)
+       {
+           t.transform.DOScale(1f, .25f).SetEase(Ease.OutBack);
+       }
+   }
+   
+   private void ScaleCloseWithDistance()
+   {
+       var list = _children.ToList();
+       CircleLayoutGroup.UpdateLayoutGroup();
+       list.RemoveAt(0);
+       DOVirtual.Float(150f, 0f, .5f, (value =>
+       {
+           CircleLayoutGroup.SetDistance(value);
+           CircleLayoutGroup.UpdateLayoutGroup();
+
+       })).SetEase(Ease.InBack);
+
+       foreach (var t in list)
+       {
+           Sequence sequence = DOTween.Sequence();
+           sequence.Append(t.transform.DOScale(0f, .6f).SetEase(Ease.InBack));
+           sequence.Join(t.transform.GetComponent<Image>().DOFade(0f, .5f));
        }
    }
    
@@ -89,22 +179,12 @@ public class CircleLayoutManager : MonoBehaviour
    {
        if (Input.GetKeyDown(KeyCode.A))
        {
-           FadeOpen();
+           Appear();
        }
        
        if (Input.GetKeyDown(KeyCode.S))
        {
-           FadeClose();
-       }
-       
-       if (Input.GetKeyDown(KeyCode.D))
-       {
-           ScaleOpen();
-       }
-       
-       if (Input.GetKeyDown(KeyCode.F))
-       {
-           ScaleClose();
+          Disappear();
        }
    }
 }
