@@ -1,5 +1,7 @@
 # Advanced-Scroll-Rect
-- A solution for mobile input that supports multi touching. It is derived from Unity's ScrollRect component.
+- A solution for mobile input that supports multi touching.
+- It fixes scroll rect teleportation glitch while multi touching conditions. 
+- It is derived from Unity's ScrollRect component.
 - It uses default scroll rect implementations for Desktop.
 ```c#
 ImprovedScrollRect : ScrollRect
