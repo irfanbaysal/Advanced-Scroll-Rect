@@ -39,4 +39,3 @@ ImprovedScrollRect : ScrollRect
         }
     }
  ```
-
